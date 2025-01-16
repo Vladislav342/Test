@@ -16,7 +16,9 @@ router.post('/login',
     userController.login
 );
 
-router.get('/hello', userController.getUsers);
+router.get('/hello', (req, res) => {
+    res.send('hello');
+});
 
 router.post('/logout', userController.logout);
 router.get('/refresh', userController.refresh);

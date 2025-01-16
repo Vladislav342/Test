@@ -2,6 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../exceptions/apiError';
 const tokenService = require('../service/tokenService');
 
+interface IUserData {
+    id: string;
+    email: string;
+}
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: IUserData;
+        }
+    }
+}
 
 module.exports = function (req: Request, res: Response, next: NextFunction) {
     try {
@@ -20,7 +32,7 @@ module.exports = function (req: Request, res: Response, next: NextFunction) {
             return next(ApiError.UnauthorizedError());
         }
 
-        // req.user = userData;
+        req.user = userData;
         next();
     } catch (e) {
         return next(ApiError.UnauthorizedError());

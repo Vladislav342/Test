@@ -2,8 +2,31 @@ const UserModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const tokenService = require('./tokenService');
-const UserDto = require('../dto/UserDto');
+// const UserDto = require('../dto/UserDto');
 const ApiError = require('../exceptions/apiError');
+
+interface IUserDto {
+    email: string,
+    id: string,
+    isActivated: boolean;
+}
+
+class UserDto implements IUserDto {
+    email;
+    id;
+    isActivated;
+
+    constructor(model) {
+        this.email = model.email;
+        this.id = model._id;
+        this.isActivated = model.isActivated;
+    }
+}
+
+type ITokens = {
+    accessToken: string,
+    refreshToken: string
+}
 
 class UserService {
     async registration(email: string, password: string) {
@@ -17,7 +40,7 @@ class UserService {
         const user = await UserModel.create({ email, password: hashPassword, activationLink });
 
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({ ...userDto });
+        const tokens: ITokens = tokenService.generateTokens({ ...userDto });
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
         return {
